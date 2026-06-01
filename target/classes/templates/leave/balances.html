@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Leave Balances</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+</head>
+<body>
+<header class="site-header">
+    <div class="container">
+        <div class="brand">SLIIT EMS</div>
+        <nav class="nav">
+            <a href="/">Dashboard</a>
+            <a href="/profile">My Profile</a>
+            <a href="/employee">Employees</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/performance">Performance</a>
+            <a href="/shifts">Shifts</a>
+            <a href="/notifications">Notifications</a>
+            <a class="btn secondary" href="/logout">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+<div class="card">
+<div class="card-header">
+    Leave Balances
+    <div class="stack" style="float: right;">
+        <a class="btn secondary" href="/leave">Leave Requests</a>
+        <a class="btn secondary" href="/">Back to Dashboard</a>
+    </div>
+</div>
+<div class="card-body">
+
+<!-- Filters -->
+<form class="toolbar" method="get">
+    <select name="employeeId">
+        <option value="">All Employees</option>
+        <option th:each="e : ${employees}" 
+                th:value="${e.id}" 
+                th:text="${e.firstName + ' ' + e.lastName}"
+                th:selected="${selectedEmployeeId == e.id}"></option>
+    </select>
+    <select name="year">
+        <option th:each="year : ${#numbers.sequence(2020, 2030)}" 
+                th:value="${year}" 
+                th:text="${year}"
+                th:selected="${selectedYear == year}"></option>
+    </select>
+    <input type="submit" value="Filter" class="btn secondary">
+</form>
+
+<div class="spacer"></div>
+
+<!-- Create New Balance Form (HR/Admin only) -->
+<div th:if="${canManageBalances}">
+    <h3>Create Leave Balance</h3>
+    <form class="toolbar" method="post" action="/leave/balances">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <select name="employeeId" required>
+            <option value="">Select Employee</option>
+            <option th:each="e : ${employees}" th:value="${e.id}" th:text="${e.firstName + ' ' + e.lastName}"></option>
+        </select>
+        <select name="leaveType" required>
+            <option value="">Leave Type</option>
+            <option th:each="type : ${T(com.example.ems.domain.leave.LeaveBalance$LeaveType).values()}" 
+                    th:value="${type}" 
+                    th:text="${type.displayName}"></option>
+        </select>
+        <input type="number" name="totalDays" placeholder="Total Days" min="0" max="365" required>
+        <input type="number" name="year" th:value="${selectedYear}" min="2020" max="2030" required>
+        <input type="submit" value="Create Balance" class="btn">
+    </form>
+    <div class="spacer"></div>
+</div>
+
+<!-- Leave Balances Table -->
+<table>
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Leave Type</th>
+            <th>Year</th>
+            <th>Total Days</th>
+            <th>Used Days</th>
+            <th>Remaining Days</th>
+            <th>Last Updated</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr th:each="balance : ${balances}">
+        <td th:text="${balance.employee.firstName + ' ' + balance.employee.lastName}">John Doe</td>
+        <td>
+            <span class="badge" th:text="${balance.leaveType.displayName}">Personal</span>
+        </td>
+        <td th:text="${balance.year}">2024</td>
+        <td th:text="${balance.totalDays}">20</td>
+        <td th:text="${balance.usedDays}">5</td>
+        <td>
+            <span th:if="${balance.remainingDays > 0}" 
+                  class="badge" 
+                  style="background: #d1fae5; color: #065f46;"
+                  th:text="${balance.remainingDays}">15</span>
+            <span th:if="${balance.remainingDays == 0}" 
+                  class="badge" 
+                  style="background: #fee2e2; color: #991b1b;"
+                  th:text="${balance.remainingDays}">0</span>
+        </td>
+        <td th:text="${balance.lastUpdated}">2024-01-01</td>
+        <td>
+            <div class="stack">
+                <span class="muted">View only</span>
+            </div>
+        </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(balances)}">
+        <td colspan="8" style="text-align: center; color: var(--muted); padding: 20px;">
+            No leave balances found for the selected criteria
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Summary Statistics -->
+<div th:if="${!balances.isEmpty()}" class="spacer"></div>
+<div th:if="${!balances.isEmpty()}" class="card" style="background: var(--panel-2);">
+    <div class="card-header">Summary Statistics</div>
+    <div class="card-body">
+        <div class="form-row">
+            <div class="form-col">
+                <p class="muted"><b>Total Employees:</b> <span th:text="${#lists.size(balances)}">0</span></p>
+            </div>
+            <div class="form-col">
+                <p class="muted"><b>Total Leave Days Allocated:</b> <span th:text="${#aggregates.sum(balances.![totalDays])}">0</span></p>
+            </div>
+            <div class="form-col">
+                <p class="muted"><b>Total Days Used:</b> <span th:text="${#aggregates.sum(balances.![usedDays])}">0</span></p>
+            </div>
+            <div class="form-col">
+                <p class="muted"><b>Total Days Remaining:</b> <span th:text="${#aggregates.sum(balances.![remainingDays])}">0</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+</div>
+</main>
+</body>
+</html>

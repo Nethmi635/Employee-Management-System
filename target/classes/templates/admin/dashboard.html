@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.9em;
+            margin-top: 4px;
+        }
+        .user-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+        .user-type-admin { border-left: 4px solid #ef4444; }
+        .user-type-manager { border-left: 4px solid #3b82f6; }
+        .user-type-employee { border-left: 4px solid #10b981; }
+        .status-active { color: #10b981; }
+        .status-locked { color: #f59e0b; }
+        .status-disabled { color: #ef4444; }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <div class="container">
+        <div class="brand">SLIIT EMS</div>
+        <nav class="nav">
+            <a href="/">Dashboard</a>
+            <a href="/profile">My Profile</a>
+            <a href="/employee">Employees</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/attendance/calendar">Calendar</a>
+            <a href="/leave">Leave</a>
+            <a href="/leave/balances">Balances</a>
+            <a href="/approvals">Approvals</a>
+            <a href="/performance">Performance</a>
+            <a href="/shifts">Shifts</a>
+            <a href="/shifts/calendar">Shift Calendar</a>
+            <a href="/shifts/roster">Team Roster</a>
+            <a href="/reports">Reports</a>
+            <a href="/notifications">Notifications</a>
+            <a href="/alerts">Alerts Dashboard</a>
+            <a href="/admin/users">User Management</a>
+            <a class="btn secondary" href="/logout">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+<div class="card">
+<div class="card-header">
+    User Management Dashboard
+    <div class="stack" style="float: right;">
+        <a class="btn secondary" href="/admin/users">Manage Users</a>
+        <a class="btn secondary" href="/">Back to Dashboard</a>
+    </div>
+</div>
+<div class="card-body">
+
+<!-- Statistics -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number" th:text="${statistics.totalUsers}">0</div>
+        <div class="stat-label">Total Users</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${statistics.activeUsers}">0</div>
+        <div class="stat-label">Active Users</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${statistics.lockedUsers}">0</div>
+        <div class="stat-label">Locked Users</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${statistics.disabledUsers}">0</div>
+        <div class="stat-label">Disabled Users</div>
+    </div>
+</div>
+
+<!-- Filters -->
+<form class="toolbar" method="get">
+    <select name="userType">
+        <option value="">All User Types</option>
+        <option th:each="type : ${userTypes}" 
+                th:value="${type}" 
+                th:text="${type}"
+                th:selected="${selectedUserType == type}"></option>
+    </select>
+    <select name="status">
+        <option value="">All Status</option>
+        <option value="inactive" th:selected="${selectedStatus == 'inactive'}">Inactive Only</option>
+    </select>
+    <input type="submit" value="Filter" class="btn secondary">
+</form>
+
+<div class="spacer"></div>
+
+<!-- User Distribution -->
+<div class="grid-2">
+    <div class="card">
+        <div class="card-header">Users by Type</div>
+        <div class="card-body">
+            <div th:each="entry : ${statistics.usersByType}">
+                <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                    <span th:text="${entry.key}">User Type</span>
+                    <span class="badge" th:text="${entry.value}">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">Users by Role</div>
+        <div class="card-body">
+            <div th:each="entry : ${statistics.usersByRole}">
+                <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                    <span th:text="${entry.key}">Role</span>
+                    <span class="badge" th:text="${entry.value}">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="spacer"></div>
+
+<!-- Users List -->
+<h3>Users</h3>
+<div th:if="${!#lists.isEmpty(users)}">
+    <div th:each="user : ${users}" 
+         th:class="'user-card user-type-' + ${user.userType.toLowerCase()}">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span class="badge" 
+                          th:style="'background: ' + (${user.userType == 'ADMIN'} ? '#ef4444' : (${user.userType == 'MANAGER'} ? '#3b82f6' : '#10b981')) + '; color: white;'"
+                          th:text="${user.userType}">User Type</span>
+                    <span th:if="${user.isActive()}" class="status-active">Active</span>
+                    <span th:if="${user.isAccountLocked()}" class="status-locked">Locked</span>
+                    <span th:if="${!user.enabled}" class="status-disabled">Disabled</span>
+                </div>
+                <div style="font-weight: bold; margin-bottom: 4px;" th:text="${user.username}">Username</div>
+                <div style="color: var(--muted); font-size: 0.9em;">
+                    <div th:text="'User Type: ' + ${user.userType}">User Type: EMPLOYEE</div>
+                    <div th:text="'Roles: ' + ${user.roles.![name].toString().replace('[', '').replace(']', '')}">Roles: EMPLOYEE</div>
+                    <div th:if="${user.lastLogin != null}" th:text="'Last Login: ' + ${#temporals.format(user.lastLogin, 'yyyy-MM-dd HH:mm')}">Last Login: 2024-01-15 14:30</div>
+                    <div th:if="${user.lastLogin == null}">Never logged in</div>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <div class="stack">
+                    <a th:href="@{'/admin/users/' + ${user.id} + '/edit'}" class="btn secondary">Edit</a>
+                    <form th:action="@{'/admin/users/' + ${user.id} + '/delete'}" method="post" style="display:inline;">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <input type="submit" value="Delete" class="btn danger">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:if="${#lists.isEmpty(users)}" style="text-align: center; color: var(--muted); padding: 20px;">
+    No users found for the selected criteria
+</div>
+
+</div>
+</div>
+</div>
+</main>
+</body>
+</html>

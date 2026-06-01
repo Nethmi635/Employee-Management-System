@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>My Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand">SLIIT EMS</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">My Area</div>
+                <a href="/my" class="nav-item">
+                    <span class="nav-icon">🏠</span>
+                    My Dashboard
+                </a>
+                <a href="/profile" class="nav-item">
+                    <span class="nav-icon">👤</span>
+                    My Profile
+                </a>
+                <a href="/attendance" class="nav-item">
+                    <span class="nav-icon">📅</span>
+                    My Attendance
+                </a>
+                <a href="/shifts" class="nav-item">
+                    <span class="nav-icon">🕐</span>
+                    My Shifts
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="content-header">
+            <h1>Welcome, <span th:text="${me.firstName}">User</span></h1>
+        </div>
+
+        <div class="content-body">
+            <div class="welcome-card">
+                <div class="card-header">Overview</div>
+                <div class="card-body">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" th:text="${statistics.myTotalShifts}">0</div>
+                            <div class="stat-label">My Total Shifts</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" th:text="${statistics.myPendingSwaps}">0</div>
+                            <div class="stat-label">My Pending Swaps</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="welcome-card">
+                <div class="card-header">My Upcoming Shifts</div>
+                <div class="card-body">
+                    <div class="shifts-table">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Start</th>
+                                <th>End</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="s : ${myShifts}">
+                                <td th:text="${s.id}">1</td>
+                                <td th:text="${s.class.simpleName == 'DayShift' ? 'Day' : 'Night'}">Day</td>
+                                <td th:text="${s.shiftDate}">2025-01-01</td>
+                                <td th:text="${s.startTime}">08:00</td>
+                                <td th:text="${s.endTime}">17:00</td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(myShifts)}">
+                                <td colspan="5" class="no-shifts">No shifts found</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="welcome-card">
+                <div class="card-header">My Pending Swap Requests</div>
+                <div class="card-body">
+                    <div class="shifts-table">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Requested Shift</th>
+                                <th>Offered Shift</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="r : ${myPendingSwaps}">
+                                <td th:text="${r.id}">1</td>
+                                <td th:text="${r.requestedShift.id}">10</td>
+                                <td th:text="${r.offeredShift.id}">20</td>
+                                <td>PENDING</td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(myPendingSwaps)}">
+                                <td colspan="4" class="no-shifts">No pending swap requests</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
+
+

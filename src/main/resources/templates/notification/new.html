@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Notification</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+</head>
+<body>
+<div class="container">
+<div class="card">
+<div class="card-header">Add Notification</div>
+<div class="card-body">
+    <a class="btn secondary" href="/notifications">Back</a>
+    <div class="spacer"></div>
+    <form th:action="@{/notifications/new}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <div class="form-row">
+            <div class="form-col">
+                <label>Recipient</label>
+                <select name="recipientId" required>
+                    <option value="">Select User</option>
+                    <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.username}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-col">
+                <label>Message</label>
+                <textarea name="message" rows="4" required placeholder="Enter notification message..."></textarea>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-col">
+                <label>
+                    <input type="checkbox" name="read" value="true"> Mark as read
+                </label>
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <input type="submit" value="Create Notification" class="btn">
+    </form>
+</div>
+</div>
+</div>
+</body>
+</html>

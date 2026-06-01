@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Leave Report</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <div class="container">
+        <div class="brand">SLIIT EMS</div>
+        <nav class="nav">
+            <a href="/">Dashboard</a>
+            <a href="/profile">My Profile</a>
+            <a href="/employee">Employees</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/attendance/calendar">Calendar</a>
+            <a href="/leave">Leave</a>
+            <a href="/leave/balances">Balances</a>
+            <a href="/approvals">Approvals</a>
+            <a href="/performance">Performance</a>
+            <a href="/shifts">Shifts</a>
+            <a href="/notifications">Notifications</a>
+            <a class="btn secondary" href="/logout">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+<div class="card">
+<div class="card-header">
+    Leave Report
+    <div class="stack" style="float: right;">
+        <a class="btn secondary" href="/reports">Reports Dashboard</a>
+        <a class="btn secondary" href="/">Back to Dashboard</a>
+    </div>
+</div>
+<div class="card-body">
+
+<!-- Filters -->
+<form class="toolbar" method="get">
+    <select name="employeeId">
+        <option value="">All Employees</option>
+        <option th:each="e : ${employees}" 
+                th:value="${e.id}" 
+                th:text="${e.firstName + ' ' + e.lastName}"
+                th:selected="${selectedEmployeeId == e.id}"></option>
+    </select>
+    <select name="status">
+        <option value="">All Status</option>
+        <option value="PENDING" th:selected="${selectedStatus == 'PENDING'}">Pending</option>
+        <option value="APPROVED" th:selected="${selectedStatus == 'APPROVED'}">Approved</option>
+        <option value="REJECTED" th:selected="${selectedStatus == 'REJECTED'}">Rejected</option>
+        <option value="CANCELLED" th:selected="${selectedStatus == 'CANCELLED'}">Cancelled</option>
+    </select>
+    <input type="submit" value="Filter" class="btn secondary">
+</form>
+
+<div class="spacer"></div>
+
+<!-- Statistics Summary -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number" th:text="${stats.totalRequests}">20</div>
+        <div class="stat-label">Total Requests</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${stats.pendingCount}">3</div>
+        <div class="stat-label">Pending</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${stats.approvedCount}">15</div>
+        <div class="stat-label">Approved</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${stats.rejectedCount}">2</div>
+        <div class="stat-label">Rejected</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${stats.cancelledCount}">0</div>
+        <div class="stat-label">Cancelled</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${stats.totalDaysRequested}">45</div>
+        <div class="stat-label">Days Requested</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${stats.approvedDays}">38</div>
+        <div class="stat-label">Days Approved</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${#numbers.formatDecimal(stats.approvalRate, 1, 1)} + '%'">75.0%</div>
+        <div class="stat-label">Approval Rate</div>
+    </div>
+</div>
+
+<div class="spacer"></div>
+
+<!-- Detailed Records Table -->
+<table>
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Leave Type</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Duration</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Submitted</th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr th:each="request : ${requests}">
+        <td th:text="${request.employee.firstName + ' ' + request.employee.lastName}">John Doe</td>
+        <td>
+            <span class="badge" th:text="${request.leaveType.displayName}">Personal</span>
+        </td>
+        <td th:text="${request.startDate}">2024-01-15</td>
+        <td th:text="${request.endDate}">2024-01-17</td>
+        <td th:text="${request.durationInDays} + ' days'">3 days</td>
+        <td th:text="${request.reason}">Family emergency</td>
+        <td>
+            <span th:if="${request.status == 'PENDING'}" 
+                  class="badge" 
+                  style="background: #fef3c7; color: #92400e;">Pending</span>
+            <span th:if="${request.status == 'APPROVED'}" 
+                  class="badge" 
+                  style="background: #d1fae5; color: #065f46;">Approved</span>
+            <span th:if="${request.status == 'REJECTED'}" 
+                  class="badge" 
+                  style="background: #fee2e2; color: #991b1b;">Rejected</span>
+            <span th:if="${request.status == 'CANCELLED'}" 
+                  class="badge" 
+                  style="background: #e5e7eb; color: #6b7280;">Cancelled</span>
+        </td>
+        <td th:text="${request.submittedAt}">2024-01-10</td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(requests)}">
+        <td colspan="8" style="text-align: center; color: var(--muted); padding: 20px;">
+            No leave requests found for the selected criteria
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</div>
+</div>
+</div>
+</main>
+</body>
+</html>

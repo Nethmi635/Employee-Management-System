@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Reports Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.9em;
+            margin-top: 4px;
+        }
+        .report-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        .report-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .report-card h3 {
+            margin-top: 0;
+            color: var(--text);
+        }
+        .report-card p {
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <div class="container">
+        <div class="brand">SLIIT EMS</div>
+        <nav class="nav">
+            <a href="/">Dashboard</a>
+            <a href="/profile">My Profile</a>
+            <a href="/employee">Employees</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/attendance/calendar">Calendar</a>
+            <a href="/leave">Leave</a>
+            <a href="/leave/balances">Balances</a>
+            <a href="/approvals">Approvals</a>
+            <a href="/performance">Performance</a>
+            <a href="/shifts">Shifts</a>
+            <a href="/notifications">Notifications</a>
+            <a class="btn secondary" href="/logout">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+<div class="card">
+<div class="card-header">
+    Reports Dashboard
+    <div class="stack" style="float: right;">
+        <a class="btn secondary" href="/">Back to Dashboard</a>
+    </div>
+</div>
+<div class="card-body">
+
+<!-- Current Month Statistics -->
+<h3>Current Month Statistics (<span th:text="${#temporals.format(currentMonth, 'MMMM yyyy')}">January 2024</span>)</h3>
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number" th:text="${totalRecords}">45</div>
+        <div class="stat-label">Total Records</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${presentCount}">38</div>
+        <div class="stat-label">Present</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${absentCount}">5</div>
+        <div class="stat-label">Absent</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${partialCount}">2</div>
+        <div class="stat-label">Partial</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${#numbers.formatDecimal(totalOvertimeHours, 1, 1)}">12.5</div>
+        <div class="stat-label">Overtime Hours</div>
+    </div>
+</div>
+
+<div class="spacer"></div>
+
+<!-- Leave Statistics -->
+<h3>Leave Statistics</h3>
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number" th:text="${pendingLeaves}">3</div>
+        <div class="stat-label">Pending Requests</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${approvedLeaves}">15</div>
+        <div class="stat-label">Approved</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${rejectedLeaves}">2</div>
+        <div class="stat-label">Rejected</div>
+    </div>
+</div>
+
+<div class="spacer"></div>
+
+<!-- Report Links -->
+<h3>Detailed Reports</h3>
+<div class="report-links">
+    <div class="report-card">
+        <h3>Attendance Report</h3>
+        <p>Detailed attendance analysis with overtime calculations and employee statistics</p>
+        <a href="/reports/attendance" class="btn">View Attendance Report</a>
+    </div>
+    
+    <div class="report-card">
+        <h3>Leave Report</h3>
+        <p>Comprehensive leave request analysis and approval statistics</p>
+        <a href="/reports/leave" class="btn">View Leave Report</a>
+    </div>
+    
+    <div class="report-card">
+        <h3>Employee Performance</h3>
+        <p>Performance reviews and KPI analysis</p>
+        <a href="/performance" class="btn">View Performance</a>
+    </div>
+    
+    <div class="report-card">
+        <h3>Export Data</h3>
+        <p>Export attendance and leave data to CSV/Excel</p>
+        <div class="stack">
+            <a href="/attendance/export.csv" class="btn secondary">Export Attendance CSV</a>
+            <a href="/attendance/export.xlsx" class="btn secondary">Export Attendance Excel</a>
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+</div>
+</main>
+</body>
+</html>

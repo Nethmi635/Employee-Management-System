@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Required - SLIIT EMS</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+        }
+        
+        .login-required-container {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 48px 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.06);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .login-required-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0 0 16px 0;
+        }
+        
+        .login-required-message {
+            font-size: 16px;
+            color: var(--muted);
+            margin: 0 0 32px 0;
+            line-height: 1.5;
+        }
+        
+        .login-button {
+            background: var(--primary);
+            color: #111827;
+            border: 1px solid #f1d36e;
+            padding: 12px 24px;
+            border-radius: 999px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(244,200,74,.4);
+            transition: all 0.3s ease;
+        }
+        
+        .login-button:hover {
+            background: var(--primary-600);
+            color: #111827;
+            transform: translateY(-2px);
+        }
+        
+        .test-credentials {
+            background: #f3f4f6;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 24px;
+            text-align: left;
+        }
+        
+        .test-credentials h4 {
+            margin: 0 0 12px 0;
+            color: var(--text);
+            font-size: 16px;
+        }
+        
+        .credential-item {
+            margin: 8px 0;
+            font-size: 14px;
+            color: var(--muted);
+        }
+        
+        .credential-item strong {
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-required-container">
+        <h1 class="login-required-title">🔒 Login Required</h1>
+        <p class="login-required-message">
+            You need to be logged in to access the profile page. Please log in with your credentials to continue.
+        </p>
+        
+        <a href="/login" class="login-button">Go to Login</a>
+        
+        <div class="test-credentials">
+            <h4>Test Credentials:</h4>
+            <div class="credential-item"><strong>Admin:</strong> admin / admin123</div>
+            <div class="credential-item"><strong>HR:</strong> hr / hr123</div>
+            <div class="credential-item"><strong>Manager:</strong> manager / manager123</div>
+            <div class="credential-item"><strong>Employee:</strong> employee / emp123</div>
+            <div class="credential-item"><strong>Database Admin:</strong> db-admin / admin123</div>
+            <div class="credential-item"><strong>Database HR:</strong> db-hr / hr123</div>
+            <div class="credential-item"><strong>Database Manager:</strong> db-manager / manager123</div>
+            <div class="credential-item"><strong>Database Employee:</strong> db-employee / emp123</div>
+        </div>
+    </div>
+</body>
+</html>

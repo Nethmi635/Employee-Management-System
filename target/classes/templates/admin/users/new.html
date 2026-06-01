@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>New User</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+</head>
+<body>
+<div class="container">
+<div class="card">
+<div class="card-header">Create User</div>
+<div class="card-body">
+    <a class="btn secondary" href="/admin/users">Back</a>
+    <div class="spacer"></div>
+    <form method="post" action="/admin/users">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <div class="form-row">
+            <div class="form-col"><label>Username</label><input name="username" required></div>
+            <div class="form-col"><label>Password</label><input type="password" name="password" required></div>
+        </div>
+        <div class="form-row">
+            <div class="form-col">
+                <label>User Type</label>
+                <select name="userType" required>
+                    <option value="">Select User Type</option>
+                    <option th:each="type : ${userTypes}" th:value="${type}" th:text="${type}">User Type</option>
+                </select>
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <fieldset>
+            <legend>Assign Roles</legend>
+            <label th:each="r: ${roles}"><input type="checkbox" name="roleIds" th:value="${r.id}"> <span th:text="${r.name}">ADMIN</span></label>
+        </fieldset>
+        <div class="spacer"></div>
+        <input type="submit" value="Create">
+    </form>
+</div>
+</div>
+</div>
+</body>
+</html>
+
+
+

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permission System Test</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+    <style>
+        .test-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+        }
+        .permission-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .permission-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        .permission-card.granted {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .permission-card.denied {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .test-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+        }
+        .test-button:hover {
+            background: #2563eb;
+        }
+        .test-button.denied {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+        .user-info {
+            background: #e0f2fe;
+            border: 1px solid #b3e5fc;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .message {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="test-section">
+        <h1>🔐 Permission System Test</h1>
+        <p>This page tests the custom permission system integration with Spring Security.</p>
+        
+        <div th:if="${param.message}" class="message">
+            ✅ <span th:text="${param.message[0]}">Test message</span>
+        </div>
+        
+        <div th:if="${username}" class="user-info">
+            <h3>Current User Information</h3>
+            <p><strong>Username:</strong> <span th:text="${username}">username</span></p>
+            <p><strong>User Type:</strong> <span th:text="${userType}">USER_TYPE</span></p>
+            <p><strong>Roles:</strong> <span th:text="${roles}">Roles</span></p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Current Permissions</h2>
+        <div class="permission-grid">
+            <div class="permission-card" th:classappend="${hasEmployeeView} ? 'granted' : 'denied'">
+                <h4>EMPLOYEE_VIEW</h4>
+                <p th:text="${hasEmployeeView} ? '✅ Granted' : '❌ Denied'">Status</p>
+            </div>
+            <div class="permission-card" th:classappend="${hasEmployeeCreate} ? 'granted' : 'denied'">
+                <h4>EMPLOYEE_CREATE</h4>
+                <p th:text="${hasEmployeeCreate} ? '✅ Granted' : '❌ Denied'">Status</p>
+            </div>
+            <div class="permission-card" th:classappend="${hasEmployeeEdit} ? 'granted' : 'denied'">
+                <h4>EMPLOYEE_EDIT</h4>
+                <p th:text="${hasEmployeeEdit} ? '✅ Granted' : '❌ Denied'">Status</p>
+            </div>
+            <div class="permission-card" th:classappend="${hasAttendanceView} ? 'granted' : 'denied'">
+                <h4>ATTENDANCE_VIEW</h4>
+                <p th:text="${hasAttendanceView} ? '✅ Granted' : '❌ Denied'">Status</p>
+            </div>
+            <div class="permission-card" th:classappend="${hasReportsView} ? 'granted' : 'denied'">
+                <h4>REPORTS_VIEW</h4>
+                <p th:text="${hasReportsView} ? '✅ Granted' : '❌ Denied'">Status</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Permission Tests</h2>
+        <p>Click these buttons to test if the permission system is working:</p>
+        
+        <div style="margin: 20px 0;">
+            <a href="/permission-test/employee-view" class="test-button" 
+               th:classappend="${!hasEmployeeView} ? 'denied' : ''"
+               th:onclick="${!hasEmployeeView} ? 'return false;' : ''">
+                Test EMPLOYEE_VIEW
+            </a>
+            <a href="/permission-test/employee-create" class="test-button"
+               th:classappend="${!hasEmployeeCreate} ? 'denied' : ''"
+               th:onclick="${!hasEmployeeCreate} ? 'return false;' : ''">
+                Test EMPLOYEE_CREATE
+            </a>
+            <a href="/permission-test/reports-view" class="test-button"
+               th:classappend="${!hasReportsView} ? 'denied' : ''"
+               th:onclick="${!hasReportsView} ? 'return false;' : ''">
+                Test REPORTS_VIEW
+            </a>
+            <a href="/permission-test/attendance-view" class="test-button"
+               th:classappend="${!hasAttendanceView} ? 'denied' : ''"
+               th:onclick="${!hasAttendanceView} ? 'return false;' : ''">
+                Test ATTENDANCE_VIEW
+            </a>
+            <a href=\"/permission-test/shift-view\" class=\"test-button\"
+               th:classappend=\"${!hasShiftView} ? 'denied' : ''\"
+               th:onclick=\"${!hasShiftView} ? 'return false;' : ''\">
+                Test SHIFT_VIEW
+            </a>
+            <a href=\"/permission-test/leave-view\" class=\"test-button\"
+               th:classappend=\"${!hasLeaveView} ? 'denied' : ''\"
+               th:onclick=\"${!hasLeaveView} ? 'return false;' : ''\">
+                Test LEAVE_VIEW
+            </a>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 All Effective Permissions</h2>
+        <div th:if="${effectivePermissions != null and !effectivePermissions.isEmpty()}">
+            <div th:each="permission : ${effectivePermissions}" 
+                 style="display: inline-block; background: #e8f5e8; padding: 5px 10px; margin: 3px; border-radius: 4px; font-size: 0.9em;">
+                <span th:text="${permission}">PERMISSION</span>
+            </div>
+        </div>
+        <div th:if="${effectivePermissions == null or effectivePermissions.isEmpty()}">
+            <p style="color: #6b7280; font-style: italic;">No custom permissions found. Only role-based permissions are active.</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Instructions</h2>
+        <ol>
+            <li><strong>Login as different users</strong> (admin, hr, manager, employee) to see different permission sets</li>
+            <li><strong>Go to Admin → User Management → Permissions</strong> to grant/revoke specific permissions</li>
+            <li><strong>Return to this page</strong> to see if the permission changes are reflected</li>
+            <li><strong>Click the test buttons</strong> to verify that Spring Security is enforcing the permissions</li>
+        </ol>
+        
+        <div style="margin-top: 20px;">
+            <a href="/admin/users/permissions" class="test-button">Go to Permission Management</a>
+            <a href="/" class="test-button">Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+</head>
+<body>
+<header class="site-header">
+    <div class="container">
+        <div class="brand">SLIIT EMS</div>
+        <nav class="nav">
+            <a href="/">Dashboard</a>
+            <a href="/employee">Employees</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/performance">Performance</a>
+            <a href="/shifts">Shifts</a>
+            <a href="/notifications">Notifications</a>
+            <a class="btn secondary" href="/logout">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    <div class="card">
+        <div class="card-header">My Profile</div>
+        <div class="card-body">
+            <div class="stack">
+                <a class="btn secondary" href="/">Back to Dashboard</a>
+                <a class="btn" th:href="@{/profile/edit}">Edit Profile</a>
+            </div>
+            <div class="spacer"></div>
+            
+            <!-- User Account Information -->
+            <h3>Account Information</h3>
+            <p class="muted"><b>Username:</b> <span th:text="${user.username}">username</span></p>
+            <p class="muted"><b>Roles:</b> 
+                <span th:each="role, iterStat : ${user.roles}" 
+                      th:text="${role.name}" 
+                      th:if="${!iterStat.last}">ROLE</span>
+                <span th:each="role, iterStat : ${user.roles}" 
+                      th:text="${', ' + role.name}" 
+                      th:if="${iterStat.last}">, ROLE</span>
+            </p>
+            <p class="muted"><b>Account Status:</b> <span th:text="${user.enabled ? 'Active' : 'Inactive'}">Active</span></p>
+            
+            <div class="spacer"></div>
+            
+            <!-- Employee Profile Information -->
+            <div th:if="${hasEmployeeProfile}">
+                <h3>Employee Information</h3>
+                <div class="stack">
+                    <img th:if="${employee.photoFilename != null}" 
+                         th:src="@{'/uploads/' + ${employee.photoFilename}}" 
+                         alt="Profile Photo" 
+                         style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb;"/>
+                </div>
+                <div class="spacer"></div>
+                <p class="muted"><b>Name:</b> <span th:text="${employee.firstName + ' ' + employee.lastName}">John Doe</span></p>
+                <p class="muted"><b>Email:</b> <span th:text="${employee.email}">john@example.com</span></p>
+                <p class="muted"><b>Phone:</b> <span th:text="${employee.phone}">1234567890</span></p>
+                <p class="muted"><b>Department:</b> <span th:text="${employee.department}">IT</span></p>
+                <p class="muted"><b>Job Title:</b> <span th:text="${employee.jobTitle}">Engineer</span></p>
+                <p class="muted"><b>Status:</b> <span th:text="${employee.active ? 'Active' : 'Inactive'}">Active</span></p>
+            </div>
+            
+            <div th:unless="${hasEmployeeProfile}">
+                <h3>Employee Information</h3>
+                <p class="muted">No employee profile found. Contact HR to set up your employee profile.</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

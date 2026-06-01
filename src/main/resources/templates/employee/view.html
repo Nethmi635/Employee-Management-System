@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Profile</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="card-header" th:text="${employee.firstName + ' ' + employee.lastName}">John Doe</div>
+        <div class="card-body">
+            <div class="stack">
+                <img th:if="${employee.photoFilename != null}" th:src="@{'/uploads/' + ${employee.photoFilename}}" alt="photo" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:1px solid #e5e7eb;"/>
+            </div>
+            <div class="spacer"></div>
+            <div class="stack">
+                <a class="btn secondary" href="/employee">Back to list</a>
+                <a class="btn" th:href="@{'/employee/' + ${employee.id} + '/edit'}">Edit</a>
+                <form th:action="@{'/employee/' + ${employee.id} + (employee.active ? '/deactivate' : '/activate')}" method="post" style="display:inline;">
+                    <button class="btn danger" th:text="${employee.active} ? 'Deactivate' : 'Activate'"></button>
+                </form>
+            </div>
+            <div class="spacer"></div>
+            <p class="muted"><b>Email:</b> <span th:text="${employee.email}">john@corp.com</span></p>
+            <p class="muted"><b>Phone:</b> <span th:text="${employee.phone}">123</span></p>
+            <p class="muted"><b>Department:</b> <span th:text="${employee.department}">IT</span></p>
+            <p class="muted"><b>Job Title:</b> <span th:text="${employee.jobTitle}">Engineer</span></p>
+            <p class="muted"><b>Status:</b> <span th:text="${employee.active} ? 'Active' : 'Inactive'">Active</span></p>
+            <div class="spacer"></div>
+            <h3>Documents</h3>
+            <form th:action="@{'/employee/' + ${employee.id} + '/documents'}" method="post" enctype="multipart/form-data">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <input type="file" name="file" required>
+                <input type="submit" value="Upload">
+            </form>
+            <ul>
+                <li th:each="d : ${documents}">
+                    <a th:href="@{'/uploads/' + ${d.storedFilename}}" th:text="${d.originalFilename}" target="_blank">document</a>
+                    <form th:action="@{'/employee/' + ${employee.id} + '/documents/' + ${d.id} + '/delete'}" method="post" style="display:inline;">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button class="btn danger" type="submit">Delete</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+    </div>
+
+</body>
+</html>
+
+

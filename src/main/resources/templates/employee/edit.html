@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Employee</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="card-header">Edit Employee</div>
+        <div class="card-body">
+            <a class="btn secondary" href="/employee">Back to list</a>
+            <div class="spacer"></div>
+            <form th:action="@{'/employee/' + ${employee.id} + '/edit'}" method="post" enctype="multipart/form-data">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <div class="form-row">
+                    <div class="form-col"><label>First Name</label><input name="firstName" th:value="${employee.firstName}" placeholder="First Name" required></div>
+                    <div class="form-col"><label>Last Name</label><input name="lastName" th:value="${employee.lastName}" placeholder="Last Name" required></div>
+                    <div class="form-col"><label>Email</label><input name="email" th:value="${employee.email}" placeholder="Email" type="email" required></div>
+                    <div class="form-col"><label>Phone</label><input name="phone" th:value="${employee.phone}" placeholder="Phone" required></div>
+                    <div class="form-col"><label>Department</label><input name="department" th:value="${employee.department}" placeholder="Department" required></div>
+                    <div class="form-col"><label>Job Title</label><input name="jobTitle" th:value="${employee.jobTitle}" placeholder="Job Title" required></div>
+                    <div class="form-col"><label>Status</label><label class="muted"><input type="checkbox" name="active" th:checked="${employee.active}"> Active</label></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-col"><label>Profile Photo</label><input type="file" name="photo" accept="image/*"></div>
+                </div>
+                <div class="spacer"></div>
+                <input type="submit" value="Save">
+            </form>
+        </div>
+    </div>
+    </div>
+
+</body>
+</html>
+
+

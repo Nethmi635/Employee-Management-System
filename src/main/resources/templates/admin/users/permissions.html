@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Permissions - <span th:text="${user.username}">Username</span></title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+    <style>
+        .user-info-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .permission-category {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .permission-category h4 {
+            margin: 0 0 10px 0;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        .permission-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 4px 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        .permission-item:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+        }
+        .permission-item input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        .permission-name {
+            font-weight: 600;
+            color: #2d3748;
+            flex: 1;
+        }
+        .permission-description {
+            font-size: 0.85em;
+            color: #718096;
+            margin-top: 2px;
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin: 2px;
+        }
+        .current-permissions {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .current-permissions h4 {
+            margin: 0 0 10px 0;
+            color: #234e52;
+        }
+        .permission-tag {
+            display: inline-block;
+            background: #38b2ac;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin: 2px;
+        }
+        .form-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .form-section h3 {
+            margin: 0 0 15px 0;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        .stat-label {
+            color: #718096;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- User Information Card -->
+    <div class="user-info-card">
+        <h2>🔐 Manage Permissions: <span th:text="${user.username}">Username</span></h2>
+        <p><strong>User Type:</strong> <span th:text="${user.userType}">USER_TYPE</span></p>
+        <p><strong>Current Roles:</strong> 
+            <span th:each="role : ${user.roles}" class="role-badge" th:text="${role.name}">ROLE</span>
+        </p>
+        <p><strong>Account Status:</strong> 
+            <span th:if="${user.enabled}" style="color: #68d391;">✅ Active</span>
+            <span th:unless="${user.enabled}" style="color: #fc8181;">❌ Disabled</span>
+        </p>
+    </div>
+
+    <!-- Permission Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number" th:text="${userPermissions != null ? userPermissions.size() : 0}">0</div>
+            <div class="stat-label">Custom Permissions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" th:text="${allPermissions != null ? allPermissions.size() : 0}">0</div>
+            <div class="stat-label">Total Available</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" th:text="${permissionCategories != null ? permissionCategories.size() : 0}">0</div>
+            <div class="stat-label">Categories</div>
+        </div>
+    </div>
+
+    <!-- Current Permissions Display -->
+    <div class="current-permissions" th:if="${userPermissions != null and !userPermissions.isEmpty()}">
+        <h4>🔐 Current Custom Permissions</h4>
+        <div>
+            <span th:each="permission : ${userPermissions}" class="permission-tag" th:text="${permission}">PERMISSION</span>
+        </div>
+        <p style="margin: 10px 0 0 0; font-size: 0.9em; color: #234e52;">
+            These are custom permissions granted to this user in addition to their role-based permissions.
+        </p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Permission Management</h2>
+                <div class="stack">
+                    <a class="btn secondary" href="/admin/users">← Back to Users</a>
+                    <a class="btn" th:href="@{'/admin/users/' + ${user.id} + '/edit'}">✏️ Edit User</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <form th:action="@{'/admin/users/' + ${user.id} + '/permissions'}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                
+                <!-- Permissions Section -->
+                <div class="form-section">
+                    <h3>🔐 Custom Permissions</h3>
+                    <div style="margin-bottom: 1rem;">
+                        <p style="color: #718096; font-size: 0.9em; margin-bottom: 15px;">
+                            <strong>💡 Important:</strong> Select specific permissions for this user. These permissions will be granted in addition to their role-based permissions. 
+                            Use this to give users access to specific features beyond their role.
+                        </p>
+                        <div style="background: #fef5e7; border: 1px solid #f6e05e; border-radius: 6px; padding: 12px; margin-bottom: 15px;">
+                            <p style="margin: 0; color: #744210; font-size: 0.9em;">
+                                <strong>📋 Permission Categories:</strong> Permissions are organized by feature area. 
+                                Check the permissions you want to grant to this user.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div th:each="category : ${permissionCategories}">
+                        <div class="permission-category">
+                            <h4 th:text="${category}">Category</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 8px;">
+                                <div th:each="permission : ${permissionsByCategory.get(category)}" class="permission-item">
+                                    <input type="checkbox" 
+                                           name="permissionNames" 
+                                           th:value="${permission.name}" 
+                                           th:checked="${userPermissions.contains(permission.name)}"
+                                           th:id="${'perm_' + permission.name}">
+                                    <div style="flex: 1;">
+                                        <div class="permission-name" th:text="${permission.name}">PERMISSION_NAME</div>
+                                        <div class="permission-description" th:text="${permission.description}">Permission description</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Submit Section -->
+                <div class="form-section">
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <button type="submit" class="btn" style="padding: 12px 24px; font-size: 1.1em;">
+                            💾 Save Permissions
+                        </button>
+                        <a href="/admin/users" class="btn secondary" style="padding: 12px 24px;">
+                            ❌ Cancel
+                        </a>
+                        <a th:href="@{'/permission-test'}" class="btn" style="padding: 12px 24px; background: #38b2ac;">
+                            🧪 Test Permissions
+                        </a>
+                    </div>
+                    <p style="margin-top: 10px; color: #718096; font-size: 0.9em;">
+                        After saving, the user will need to log out and log back in for permission changes to take effect.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Add some interactive features
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click handlers to permission items
+    const permissionItems = document.querySelectorAll('.permission-item');
+    permissionItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            if (e.target.type !== 'checkbox') {
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+            }
+        });
+    });
+    
+    // Add visual feedback for form changes
+    const form = document.querySelector('form');
+    const submitBtn = document.querySelector('button[type="submit"]');
+    let hasChanges = false;
+    
+    form.addEventListener('change', function() {
+        hasChanges = true;
+        submitBtn.style.background = '#f59e0b';
+        submitBtn.textContent = '💾 Save Permissions (Modified)';
+    });
+    
+    // Confirm before leaving if there are unsaved changes
+    window.addEventListener('beforeunload', function(e) {
+        if (hasChanges) {
+            e.preventDefault();
+            e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        }
+    });
+    
+    // Reset change tracking on form submit
+    form.addEventListener('submit', function() {
+        hasChanges = false;
+    });
+    
+    // Add select all/none functionality for each category
+    const categories = document.querySelectorAll('.permission-category');
+    categories.forEach(category => {
+        const header = category.querySelector('h4');
+        const checkboxes = category.querySelectorAll('input[type="checkbox"]');
+        
+        // Add select all/none buttons
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.marginBottom = '10px';
+        buttonContainer.innerHTML = `
+            <button type="button" class="select-all-btn" style="padding: 4px 8px; margin-right: 8px; background: #e2e8f0; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 0.8em;">Select All</button>
+            <button type="button" class="select-none-btn" style="padding: 4px 8px; background: #e2e8f0; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 0.8em;">Select None</button>
+        `;
+        
+        header.parentNode.insertBefore(buttonContainer, header.nextSibling);
+        
+        // Add event listeners
+        buttonContainer.querySelector('.select-all-btn').addEventListener('click', function() {
+            checkboxes.forEach(cb => cb.checked = true);
+            form.dispatchEvent(new Event('change'));
+        });
+        
+        buttonContainer.querySelector('.select-none-btn').addEventListener('click', function() {
+            checkboxes.forEach(cb => cb.checked = false);
+            form.dispatchEvent(new Event('change'));
+        });
+    });
+});
+</script>
+</body>
+</html>

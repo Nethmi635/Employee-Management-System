@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Alerts Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.9em;
+            margin-top: 4px;
+        }
+        .alert-item {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            border-left: 4px solid;
+        }
+        .priority-urgent { border-left-color: #ef4444; }
+        .priority-high { border-left-color: #f59e0b; }
+        .priority-medium { border-left-color: #3b82f6; }
+        .priority-low { border-left-color: #6b7280; }
+        .alert-type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+        }
+        .priority-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.7em;
+            font-weight: bold;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <div class="container">
+        <div class="brand">SLIIT EMS</div>
+        <nav class="nav">
+            <a href="/">Dashboard</a>
+            <a href="/profile">My Profile</a>
+            <a href="/employee">Employees</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/attendance/calendar">Calendar</a>
+            <a href="/leave">Leave</a>
+            <a href="/leave/balances">Balances</a>
+            <a href="/approvals">Approvals</a>
+            <a href="/performance">Performance</a>
+            <a href="/shifts">Shifts</a>
+            <a href="/shifts/calendar">Shift Calendar</a>
+            <a href="/shifts/roster">Team Roster</a>
+            <a href="/reports">Reports</a>
+            <a href="/notifications">Notifications</a>
+            <a href="/alerts">Alerts Dashboard</a>
+            <a class="btn secondary" href="/logout">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+<div class="card">
+<div class="card-header">
+    Alerts Dashboard
+    <div class="stack" style="float: right;">
+        <a class="btn secondary" href="/notifications">View Notifications</a>
+        <a class="btn secondary" href="/notifications/settings">Settings</a>
+        <a class="btn secondary" href="/">Back to Dashboard</a>
+    </div>
+</div>
+<div class="card-body">
+
+<!-- Statistics -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number" th:text="${totalNotifications}">0</div>
+        <div class="stat-label">Total Alerts</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${unreadCount}">0</div>
+        <div class="stat-label">Unread Alerts</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${expiredCount}">0</div>
+        <div class="stat-label">Expired Alerts</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${#lists.size(recentNotifications)}">0</div>
+        <div class="stat-label">Recent (24h)</div>
+    </div>
+</div>
+
+<!-- Filters -->
+<form class="toolbar" method="get">
+    <select name="alertType">
+        <option value="">All Alert Types</option>
+        <option th:each="type : ${alertTypes}" 
+                th:value="${type}" 
+                th:text="${type.displayName}"
+                th:selected="${selectedAlertType == type}"></option>
+    </select>
+    <select name="priority">
+        <option value="">All Priorities</option>
+        <option th:each="priority : ${priorities}" 
+                th:value="${priority}" 
+                th:text="${priority.displayName}"
+                th:selected="${selectedPriority == priority}"></option>
+    </select>
+    <select name="unread">
+        <option value="">All Status</option>
+        <option value="true" th:selected="${selectedUnread == true}">Unread Only</option>
+        <option value="false" th:selected="${selectedUnread == false}">Read Only</option>
+    </select>
+    <input type="submit" value="Filter" class="btn secondary">
+</form>
+
+<div class="spacer"></div>
+
+<!-- Alert Type Distribution -->
+<h3>Alert Distribution by Type</h3>
+<div class="grid-2">
+    <div class="card">
+        <div class="card-header">By Alert Type</div>
+        <div class="card-body">
+            <div th:each="entry : ${byAlertType}">
+                <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                    <span th:text="${entry.key.displayName}">Alert Type</span>
+                    <span class="badge" th:text="${entry.value}">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">By Priority</div>
+        <div class="card-body">
+            <div th:each="entry : ${byPriority}">
+                <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                    <span th:text="${entry.key.displayName}">Priority</span>
+                    <span class="badge" th:text="${entry.value}">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="spacer"></div>
+
+<!-- Recent Alerts -->
+<h3>Recent Alerts (Last 24 Hours)</h3>
+<div th:if="${!#lists.isEmpty(recentNotifications)}">
+    <div th:each="alert : ${recentNotifications}" 
+         th:class="'alert-item priority-' + ${alert.priority.name().toLowerCase()}">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span class="alert-type-badge" 
+                          th:style="'background: ' + ${alert.alertTypeColor}"
+                          th:text="${alert.alertType.displayName}">Alert Type</span>
+                    <span class="priority-badge" 
+                          th:style="'background: ' + ${alert.priorityColor}"
+                          th:text="${alert.priority.displayName}">Priority</span>
+                    <span th:if="${!alert.read}" class="badge" style="background: #fef3c7; color: #92400e;">Unread</span>
+                </div>
+                <div style="font-weight: bold; margin-bottom: 4px;" th:text="${alert.title}">Alert Title</div>
+                <div style="color: var(--muted);" th:text="${alert.message}">Alert message content</div>
+            </div>
+            <div style="text-align: right; color: var(--muted); font-size: 0.9em;">
+                <div th:text="${#temporals.format(alert.createdAt, 'MMM dd, HH:mm')}">Jan 15, 14:30</div>
+                <div th:if="${alert.expiresAt != null}" th:text="'Expires: ' + ${#temporals.format(alert.expiresAt, 'MMM dd')}">Expires: Jan 20</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:if="${#lists.isEmpty(recentNotifications)}" style="text-align: center; color: var(--muted); padding: 20px;">
+    No recent alerts
+</div>
+
+<div class="spacer"></div>
+
+<!-- All Alerts -->
+<h3>All Alerts</h3>
+<div th:if="${!#lists.isEmpty(notifications)}">
+    <div th:each="alert : ${notifications}" 
+         th:class="'alert-item priority-' + ${alert.priority.name().toLowerCase()}">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span class="alert-type-badge" 
+                          th:style="'background: ' + ${alert.alertTypeColor}"
+                          th:text="${alert.alertType.displayName}">Alert Type</span>
+                    <span class="priority-badge" 
+                          th:style="'background: ' + ${alert.priorityColor}"
+                          th:text="${alert.priority.displayName}">Priority</span>
+                    <span th:if="${!alert.read}" class="badge" style="background: #fef3c7; color: #92400e;">Unread</span>
+                    <span th:if="${alert.expired}" class="badge" style="background: #fee2e2; color: #991b1b;">Expired</span>
+                </div>
+                <div style="font-weight: bold; margin-bottom: 4px;" th:text="${alert.title}">Alert Title</div>
+                <div style="color: var(--muted);" th:text="${alert.message}">Alert message content</div>
+                <div style="margin-top: 4px; font-size: 0.9em; color: var(--muted);">
+                    To: <span th:text="${alert.recipient.username}">user@example.com</span>
+                </div>
+            </div>
+            <div style="text-align: right; color: var(--muted); font-size: 0.9em;">
+                <div th:text="${#temporals.format(alert.createdAt, 'MMM dd, HH:mm')}">Jan 15, 14:30</div>
+                <div th:if="${alert.readAt != null}" th:text="'Read: ' + ${#temporals.format(alert.readAt, 'MMM dd')}">Read: Jan 16</div>
+                <div th:if="${alert.expiresAt != null}" th:text="'Expires: ' + ${#temporals.format(alert.expiresAt, 'MMM dd')}">Expires: Jan 20</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:if="${#lists.isEmpty(notifications)}" style="text-align: center; color: var(--muted); padding: 20px;">
+    No alerts found for the selected criteria
+</div>
+
+</div>
+</div>
+</div>
+</main>
+</body>
+</html>

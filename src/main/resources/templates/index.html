@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMS Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">SLIIT EMS</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Profile & Management</div>
+                    <a href="/my" class="nav-item" sec:authorize="!hasRole('ADMIN')">
+                        <span class="nav-icon">🏠</span>
+                        My Dashboard
+                    </a>
+                    <a href="/profile" class="nav-item">
+                        <span class="nav-icon">👤</span>
+                        My Profile
+                    </a>
+                    <a href="/employee" class="nav-item" sec:authorize="hasRole('ADMIN') or hasRole('HR')">
+                        <span class="nav-icon">👥</span>
+                        Employees
+                    </a>
+                    <a href="/admin/users" class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <span class="nav-icon">⚙️</span>
+                        User Management
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Attendance & Time</div>
+                    <a href="/attendance" class="nav-item">
+                        <span class="nav-icon">📅</span>
+                        Attendance
+                    </a>
+                    <a href="/attendance/calendar" class="nav-item">
+                        <span class="nav-icon">📊</span>
+                        Calendar
+                    </a>
+                    <a href="/shifts" class="nav-item">
+                        <span class="nav-icon">🕐</span>
+                        Shifts
+                    </a>
+                    <a href="/shifts/calendar" class="nav-item">
+                        <span class="nav-icon">📋</span>
+                        Shift Calendar
+                    </a>
+                    <a href="/shifts/roster" class="nav-item">
+                        <span class="nav-icon">👥</span>
+                        Team Roster
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Leave & Benefits</div>
+                    <a href="/leave" class="nav-item">
+                        <span class="nav-icon">🏖️</span>
+                        Leave
+                    </a>
+                    <a href="/leave/balances" class="nav-item">
+                        <span class="nav-icon">⚖️</span>
+                        Balances
+                    </a>
+                    <a href="/approvals" class="nav-item" sec:authorize="hasAnyRole('MANAGER','HR','ADMIN')">
+                        <span class="nav-icon">✅</span>
+                        Approvals
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Performance & Reports</div>
+                    <a href="/performance" class="nav-item">
+                        <span class="nav-icon">📈</span>
+                        Performance
+                    </a>
+                    <a href="/performance/dashboard" class="nav-item">
+                        <span class="nav-icon">📊</span>
+                        Perf. Dashboard
+                    </a>
+                    <a href="/reports" class="nav-item" sec:authorize="hasAnyRole('MANAGER','HR','ADMIN')">
+                        <span class="nav-icon">📄</span>
+                        Reports
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="/notifications" class="nav-item">
+                        <span class="nav-icon">🔔</span>
+                        Notifications
+                        <span th:if="${unreadNotificationCount > 0}" 
+                              class="notification-badge" 
+                              th:text="${unreadNotificationCount}">0</span>
+                    </a>
+                    <a href="/alerts" class="nav-item" sec:authorize="hasAnyRole('MANAGER','HR','ADMIN')">
+                        <span class="nav-icon">⚠️</span>
+                        Alerts Dashboard
+                    </a>
+                    <a href="/notifications/settings" class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <span class="nav-icon">⚙️</span>
+                        Notification Settings
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="/admin/dashboard" class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <span class="nav-icon">🏠</span>
+                        User Dashboard
+                    </a>
+                    <a href="/permission-test" class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <span class="nav-icon">🔐</span>
+                        Permission Test
+                    </a>
+                    <a href="/auth/forgot-password" class="nav-item">
+                        <span class="nav-icon">🔑</span>
+                        Forgot Password
+                    </a>
+                    <a href="/logout" class="nav-item logout">
+                        <span class="nav-icon">🚪</span>
+                        Logout
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Welcome to SLIIT EMS</h1>
+            </div>
+            
+            <div class="content-body">
+                <div class="welcome-card">
+                    <div class="card-header">Dashboard Overview</div>
+                    <div class="card-body">
+                        <p class="muted">Use the navigation sidebar to manage employees, attendance, performance, shifts, and notifications.</p>
+                        <div class="spacer"></div>
+                        <div class="quick-actions">
+                            <a class="btn" href="/employee">Go to Employees</a>
+                            <a class="btn secondary" href="/attendance">Open Attendance</a>
+                            <a class="btn secondary" href="/performance">View Performance</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
+
+

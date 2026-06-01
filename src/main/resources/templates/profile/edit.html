@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+</head>
+<body>
+<header class="site-header">
+    <div class="container">
+        <div class="brand">SLIIT EMS</div>
+        <nav class="nav">
+            <a href="/">Dashboard</a>
+            <a href="/employee">Employees</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/performance">Performance</a>
+            <a href="/shifts">Shifts</a>
+            <a href="/notifications">Notifications</a>
+            <a class="btn secondary" href="/logout">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    <div class="card">
+        <div class="card-header">Edit My Profile</div>
+        <div class="card-body">
+            <div class="stack">
+                <a class="btn secondary" href="/profile">Back to Profile</a>
+            </div>
+            <div class="spacer"></div>
+            
+            <form th:action="@{/profile/edit}" method="post" enctype="multipart/form-data">
+                <div th:if="${hasEmployeeProfile}">
+                    <h3>Employee Information</h3>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" name="firstName" th:value="${employee.firstName}">
+                        </div>
+                        <div class="form-col">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" name="lastName" th:value="${employee.lastName}">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" th:value="${employee.email}">
+                        </div>
+                        <div class="form-col">
+                            <label for="phone">Phone</label>
+                            <input type="text" id="phone" name="phone" th:value="${employee.phone}">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="department">Department</label>
+                            <input type="text" id="department" name="department" th:value="${employee.department}">
+                        </div>
+                        <div class="form-col">
+                            <label for="jobTitle">Job Title</label>
+                            <input type="text" id="jobTitle" name="jobTitle" th:value="${employee.jobTitle}">
+                        </div>
+                    </div>
+                    
+                    <div class="form-col">
+                        <label for="photo">Profile Photo</label>
+                        <input type="file" id="photo" name="photo" accept="image/*">
+                        <div th:if="${employee.photoFilename != null}" class="spacer"></div>
+                        <img th:if="${employee.photoFilename != null}" 
+                             th:src="@{'/uploads/' + ${employee.photoFilename}}" 
+                             alt="Current Photo" 
+                             style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:1px solid #e5e7eb;"/>
+                    </div>
+                </div>
+                
+                <div th:unless="${hasEmployeeProfile}">
+                    <h3>Employee Information</h3>
+                    <p class="muted">No employee profile found. Contact HR to set up your employee profile.</p>
+                </div>
+                
+                <div class="spacer"></div>
+                <div class="stack">
+                    <button type="submit" class="btn">Update Profile</button>
+                    <a class="btn secondary" href="/profile">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Shift Calendar</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+    <style>
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .calendar-header {
+            background: var(--primary);
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .calendar-day {
+            background: white;
+            padding: 8px;
+            min-height: 100px;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+        .calendar-day.other-month {
+            background: #f9fafb;
+            color: #9ca3af;
+        }
+        .calendar-day.today {
+            background: #fef3c7;
+        }
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .shift-item {
+            font-size: 10px;
+            margin: 1px 0;
+            padding: 2px 4px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .shift-item.day-shift {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .shift-item.night-shift {
+            background: #1f2937;
+            color: #f9fafb;
+        }
+        .month-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <div class="container">
+        <div class="brand">SLIIT EMS</div>
+        <nav class="nav">
+            <a href="/">Dashboard</a>
+            <a href="/profile">My Profile</a>
+            <a href="/employee">Employees</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/attendance/calendar">Calendar</a>
+            <a href="/leave">Leave</a>
+            <a href="/leave/balances">Balances</a>
+            <a href="/approvals">Approvals</a>
+            <a href="/performance">Performance</a>
+            <a href="/shifts">Shifts</a>
+            <a href="/shifts/roster">Team Roster</a>
+            <a href="/reports">Reports</a>
+            <a href="/notifications">Notifications</a>
+            <a class="btn secondary" href="/logout">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+<div class="card">
+<div class="card-header">
+    Shift Calendar
+    <div class="stack" style="float: right;">
+        <a class="btn secondary" href="/shifts">Shift Management</a>
+        <a class="btn secondary" href="/shifts/roster">Team Roster</a>
+        <a class="btn secondary" href="/">Back to Dashboard</a>
+    </div>
+</div>
+<div class="card-body">
+
+<!-- Filters -->
+<form class="toolbar" method="get">
+    <select name="employeeId">
+        <option value="">All Employees</option>
+        <option th:each="e : ${employees}" 
+                th:value="${e.id}" 
+                th:text="${e.firstName + ' ' + e.lastName}"
+                th:selected="${selectedEmployeeId == e.id}"></option>
+    </select>
+    <input type="month" name="month" th:value="${currentMonth}">
+    <input type="submit" value="Filter" class="btn secondary">
+</form>
+
+<div class="spacer"></div>
+
+<!-- Month Navigation -->
+<div class="month-navigation">
+    <a th:href="@{/shifts/calendar(employeeId=${selectedEmployeeId}, month=${#temporals.format(yearMonth.minusMonths(1), 'yyyy-MM')})}" 
+       class="btn secondary">← Previous</a>
+    <h2 th:text="${#temporals.format(yearMonth, 'MMMM yyyy')}">January 2024</h2>
+    <a th:href="@{/shifts/calendar(employeeId=${selectedEmployeeId}, month=${#temporals.format(yearMonth.plusMonths(1), 'yyyy-MM')})}" 
+       class="btn secondary">Next →</a>
+</div>
+
+<!-- Calendar -->
+<div class="calendar">
+    <!-- Calendar Header -->
+    <div class="calendar-header">Sun</div>
+    <div class="calendar-header">Mon</div>
+    <div class="calendar-header">Tue</div>
+    <div class="calendar-header">Wed</div>
+    <div class="calendar-header">Thu</div>
+    <div class="calendar-header">Fri</div>
+    <div class="calendar-header">Sat</div>
+    
+    <!-- Calendar Days -->
+    <div th:each="day : ${calendarDays}" 
+         th:class="'calendar-day' + (${day.month != yearMonth.month} ? ' other-month' : '') + (${day.equals(T(java.time.LocalDate).now())} ? ' today' : '')">
+        
+        <div class="day-number" th:text="${day.dayOfMonth}">1</div>
+        
+        <!-- Shifts for this day -->
+        <div th:each="shiftItem : ${monthlyShifts}" 
+             th:if="${shiftItem.date == day}"
+             th:class="'shift-item ' + (${shiftItem.shiftType == 'DayShift'} ? 'day-shift' : 'night-shift')">
+            <div th:text="${shiftItem.employee.firstName + ' ' + shiftItem.employee.lastName}">John Doe</div>
+            <div th:text="${shiftItem.startTime} + '-' + ${shiftItem.endTime}">09:00-17:00</div>
+        </div>
+    </div>
+</div>
+
+<!-- Legend -->
+<div class="spacer"></div>
+<div class="card" style="background: var(--panel-2);">
+    <div class="card-header">Legend</div>
+    <div class="card-body">
+        <div class="stack">
+            <div class="shift-item day-shift">Day Shift</div>
+            <div class="shift-item night-shift">Night Shift</div>
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+</div>
+</main>
+</body>
+</html>

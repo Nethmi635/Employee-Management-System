@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Swap Request</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin: 10px 0; }
+        label { display: block; margin-bottom: 5px; }
+        input, button { padding: 8px; margin: 5px; }
+        .result { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>Test Swap Request Functionality</h1>
+    
+    <div class="form-group">
+        <label>Username:</label>
+        <input type="text" id="username" value="admin" placeholder="Enter username">
+    </div>
+    
+    <div class="form-group">
+        <label>Password:</label>
+        <input type="password" id="password" value="admin123" placeholder="Enter password">
+    </div>
+    
+    <div class="form-group">
+        <label>Requested Shift ID:</label>
+        <input type="number" id="requestedShiftId" value="1" placeholder="Enter shift ID to request">
+    </div>
+    
+    <div class="form-group">
+        <label>Offered Shift ID:</label>
+        <input type="number" id="offeredShiftId" value="2" placeholder="Enter your shift ID">
+    </div>
+    
+    <div class="form-group">
+        <label>Reason:</label>
+        <input type="text" id="reason" value="Test swap request" placeholder="Enter reason">
+    </div>
+    
+    <button onclick="testSwapRequest()">Test Swap Request</button>
+    <button onclick="checkPendingSwaps()">Check Pending Swaps</button>
+    <button onclick="goToShifts()">Go to Shifts Page</button>
+    
+    <div id="result" class="result" style="display: none;"></div>
+
+    <script>
+        function showResult(message, isSuccess = true) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = `result ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.innerHTML = message;
+        }
+
+        async function testSwapRequest() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const requestedShiftId = document.getElementById('requestedShiftId').value;
+            const offeredShiftId = document.getElementById('offeredShiftId').value;
+            const reason = document.getElementById('reason').value;
+            
+            showResult('Testing swap request...', true);
+            
+            try {
+                // First, try to login using form submission
+                const loginForm = document.createElement('form');
+                loginForm.method = 'POST';
+                loginForm.action = '/login';
+                loginForm.style.display = 'none';
+                
+                const usernameField = document.createElement('input');
+                usernameField.type = 'hidden';
+                usernameField.name = 'username';
+                usernameField.value = username;
+                
+                const passwordField = document.createElement('input');
+                passwordField.type = 'hidden';
+                passwordField.name = 'password';
+                passwordField.value = password;
+                
+                loginForm.appendChild(usernameField);
+                loginForm.appendChild(passwordField);
+                document.body.appendChild(loginForm);
+                
+                // Submit the form
+                loginForm.submit();
+                
+                // Wait a bit then try the swap request
+                setTimeout(async () => {
+                    try {
+                        const formData = new FormData();
+                        formData.append('requestedShiftId', requestedShiftId);
+                        formData.append('offeredShiftId', offeredShiftId);
+                        formData.append('reason', reason);
+                        
+                        const swapResponse = await fetch('/shifts/swap-request', {
+                            method: 'POST',
+                            body: formData,
+                            credentials: 'include'
+                        });
+                        
+                        if (swapResponse.ok) {
+                            showResult('✅ Swap request created successfully! Check the shifts page for pending requests.', true);
+                        } else {
+                            showResult('❌ Failed to create swap request. Status: ' + swapResponse.status, false);
+                        }
+                    } catch (error) {
+                        showResult('❌ Error creating swap request: ' + error.message, false);
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                showResult('❌ Error: ' + error.message, false);
+            }
+        }
+        
+        async function checkPendingSwaps() {
+            showResult('Checking pending swaps...', true);
+            
+            try {
+                const response = await fetch('/shifts', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const html = await response.text();
+                    if (html.includes('Pending Swap Requests')) {
+                        showResult('✅ Pending swap requests section found in shifts page!', true);
+                    } else {
+                        showResult('❌ Pending swap requests section not found.', false);
+                    }
+                } else {
+                    showResult('❌ Failed to access shifts page. Status: ' + response.status, false);
+                }
+            } catch (error) {
+                showResult('❌ Error: ' + error.message, false);
+            }
+        }
+        
+        function goToShifts() {
+            window.open('/shifts', '_blank');
+        }
+    </script>
+</body>
+</html>

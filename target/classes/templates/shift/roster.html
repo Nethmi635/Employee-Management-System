@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Roster - EMS</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.8em;
+        }
+        .shift-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+        .shift-type-day {
+            border-left: 4px solid #3b82f6;
+        }
+        .shift-type-night {
+            border-left: 4px solid #1f2937;
+        }
+    </style>
+    <script>
+        // Set minimum date to today for date inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            dateInputs.forEach(input => {
+                input.setAttribute('min', today);
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">SLIIT EMS</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Profile & Management</div>
+                    <a href="/profile" class="nav-item">
+                        <span class="nav-icon">👤</span>
+                        My Profile
+                    </a>
+                    <a href="/employee" class="nav-item">
+                        <span class="nav-icon">👥</span>
+                        Employees
+                    </a>
+                    <a href="/admin/users" class="nav-item">
+                        <span class="nav-icon">⚙️</span>
+                        User Management
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Attendance & Time</div>
+                    <a href="/attendance" class="nav-item">
+                        <span class="nav-icon">📅</span>
+                        Attendance
+                    </a>
+                    <a href="/attendance/calendar" class="nav-item">
+                        <span class="nav-icon">📊</span>
+                        Calendar
+                    </a>
+                    <a href="/shifts" class="nav-item">
+                        <span class="nav-icon">🕐</span>
+                        Shifts
+                    </a>
+                    <a href="/shifts/calendar" class="nav-item">
+                        <span class="nav-icon">📋</span>
+                        Shift Calendar
+                    </a>
+                    <a href="/shifts/roster" class="nav-item">
+                        <span class="nav-icon">👥</span>
+                        Team Roster
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Leave & Benefits</div>
+                    <a href="/leave" class="nav-item">
+                        <span class="nav-icon">🏖️</span>
+                        Leave
+                    </a>
+                    <a href="/leave/balances" class="nav-item">
+                        <span class="nav-icon">⚖️</span>
+                        Balances
+                    </a>
+                    <a href="/approvals" class="nav-item">
+                        <span class="nav-icon">✅</span>
+                        Approvals
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Performance & Reports</div>
+                    <a href="/performance" class="nav-item">
+                        <span class="nav-icon">📈</span>
+                        Performance
+                    </a>
+                    <a href="/performance/dashboard" class="nav-item">
+                        <span class="nav-icon">📊</span>
+                        Perf. Dashboard
+                    </a>
+                    <a href="/reports" class="nav-item">
+                        <span class="nav-icon">📄</span>
+                        Reports
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <a href="/notifications" class="nav-item">
+                        <span class="nav-icon">🔔</span>
+                        Notifications
+                    </a>
+                    <a href="/alerts" class="nav-item">
+                        <span class="nav-icon">⚠️</span>
+                        Alerts Dashboard
+                    </a>
+                    <a href="/notifications/settings" class="nav-item">
+                        <span class="nav-icon">⚙️</span>
+                        Notification Settings
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="/admin/dashboard" class="nav-item">
+                        <span class="nav-icon">🏠</span>
+                        User Dashboard
+                    </a>
+                    <a href="/auth/forgot-password" class="nav-item">
+                        <span class="nav-icon">🔑</span>
+                        Forgot Password
+                    </a>
+                    <a href="/logout" class="nav-item logout">
+                        <span class="nav-icon">🚪</span>
+                        Logout
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Team Roster</h1>
+                <div class="stack" style="float: right;">
+                    <a class="btn secondary" href="/shifts">Shift Management</a>
+                    <a class="btn secondary" href="/shifts/calendar">Shift Calendar</a>
+                    <a class="btn secondary" href="/">Back to Dashboard</a>
+                </div>
+            </div>
+            
+            <div class="content-body">
+                <!-- Date Filter -->
+                <div class="welcome-card">
+                    <div class="card-header">Date Filter</div>
+                    <div class="card-body">
+                        <form class="toolbar" method="get">
+                            <input type="date" name="date" th:value="${selectedDate}" min="">
+                            <input type="submit" value="Filter" class="btn secondary">
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="welcome-card">
+                    <div class="card-header">Shift Statistics</div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-number" th:text="${statistics.totalShifts}">25</div>
+                                <div class="stat-label">Total Shifts</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" th:text="${statistics.dayShifts}">15</div>
+                                <div class="stat-label">Day Shifts</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" th:text="${statistics.nightShifts}">10</div>
+                                <div class="stat-label">Night Shifts</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" th:text="${statistics.pendingSwapRequests}">3</div>
+                                <div class="stat-label">Pending Swaps</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Roster for Selected Date -->
+                <div class="welcome-card">
+                    <div class="card-header">Team Roster for <span th:text="${selectedDate}">2024-01-15</span></div>
+                    <div class="card-body">
+                        <div th:if="${!teamRoster.isEmpty()}">
+                            <div th:each="rosterItem : ${teamRoster}" 
+                                 th:class="'shift-card shift-type-' + (${rosterItem.shiftType == 'DayShift'} ? 'day' : 'night')">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div><strong th:text="${rosterItem.employee.firstName + ' ' + rosterItem.employee.lastName}">John Doe</strong></div>
+                                        <div class="muted" th:text="${rosterItem.shiftType}">DayShift</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div th:text="${rosterItem.shift.startTime} + ' - ' + ${rosterItem.shift.endTime}">09:00 - 17:00</div>
+                                        <div class="muted" th:text="${rosterItem.duration} + ' hours'">8.0 hours</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${teamRoster.isEmpty()}" style="text-align: center; color: var(--muted); padding: 40px;">
+                            No shifts scheduled for this date
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

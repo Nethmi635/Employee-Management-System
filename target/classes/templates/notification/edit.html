@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Notification</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+</head>
+<body>
+<div class="container">
+<div class="card">
+<div class="card-header">Edit Notification</div>
+<div class="card-body">
+    <a class="btn secondary" href="/notifications">Back</a>
+    <div class="spacer"></div>
+    <form th:action="@{'/notifications/' + ${notification.id} + '/edit'}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <div class="form-row">
+            <div class="form-col">
+                <label>Recipient</label>
+                <select name="recipientId" required>
+                    <option th:each="u : ${users}" 
+                            th:value="${u.id}" 
+                            th:text="${u.username}"
+                            th:selected="${u.id == notification.recipient.id}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-col">
+                <label>Message</label>
+                <textarea name="message" rows="4" required th:text="${notification.message}"></textarea>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-col">
+                <label>
+                    <input type="checkbox" name="read" value="true" th:checked="${notification.read}"> Mark as read
+                </label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-col">
+                <label>Created At</label>
+                <input type="text" th:value="${notification.createdAt}" readonly class="muted">
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <input type="submit" value="Update Notification" class="btn">
+    </form>
+</div>
+</div>
+</div>
+</body>
+</html>

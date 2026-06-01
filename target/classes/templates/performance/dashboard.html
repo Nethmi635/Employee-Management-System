@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Performance Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.9em;
+            margin-top: 4px;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .kpi-progress {
+            background: var(--panel-2);
+            border-radius: 8px;
+            padding: 8px;
+            margin: 4px 0;
+        }
+        .kpi-progress-bar {
+            background: var(--border);
+            border-radius: 4px;
+            height: 8px;
+            overflow: hidden;
+        }
+        .kpi-progress-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .kpi-progress-fill.achieved { background: #10b981; }
+        .kpi-progress-fill.on-track { background: #3b82f6; }
+        .kpi-progress-fill.needs-improvement { background: #f59e0b; }
+        .kpi-progress-fill.at-risk { background: #ef4444; }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <div class="container">
+        <div class="brand">SLIIT EMS</div>
+        <nav class="nav">
+            <a href="/">Dashboard</a>
+            <a href="/profile">My Profile</a>
+            <a href="/employee">Employees</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/attendance/calendar">Calendar</a>
+            <a href="/leave">Leave</a>
+            <a href="/leave/balances">Balances</a>
+            <a href="/approvals">Approvals</a>
+            <a href="/performance">Performance</a>
+            <a href="/shifts">Shifts</a>
+            <a href="/reports">Reports</a>
+            <a href="/notifications">Notifications</a>
+            <a class="btn secondary" href="/logout">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+<div class="card">
+<div class="card-header">
+    Performance Dashboard
+    <div class="stack" style="float: right;">
+        <a class="btn secondary" href="/performance">Performance List</a>
+        <a class="btn secondary" href="/">Back to Dashboard</a>
+    </div>
+</div>
+<div class="card-body">
+
+<!-- Filters -->
+<form class="toolbar" method="get">
+    <select name="employeeId">
+        <option value="">All Employees</option>
+        <option th:each="e : ${employees}" 
+                th:value="${e.id}" 
+                th:text="${e.firstName + ' ' + e.lastName}"
+                th:selected="${selectedEmployeeId == e.id}"></option>
+    </select>
+    <input type="submit" value="Filter" class="btn secondary">
+</form>
+
+<div class="spacer"></div>
+
+<!-- Performance Statistics -->
+<h3>Performance Statistics</h3>
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number" th:text="${#numbers.formatDecimal(stats.averageRating, 1, 1)}">4.2</div>
+        <div class="stat-label">Average Rating</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${stats.totalReviews}">15</div>
+        <div class="stat-label">Total Reviews</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${stats.quarterlyReviews}">12</div>
+        <div class="stat-label">Quarterly Reviews</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${stats.annualReviews}">3</div>
+        <div class="stat-label">Annual Reviews</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${#numbers.formatDecimal(stats.averageKpiProgress, 1, 1)} + '%'">78.5%</div>
+        <div class="stat-label">Avg KPI Progress</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${stats.totalKpis}">8</div>
+        <div class="stat-label">Total KPIs</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" th:text="${stats.achievedKpis}">5</div>
+        <div class="stat-label">Achieved KPIs</div>
+    </div>
+</div>
+
+<div class="spacer"></div>
+
+<!-- Dashboard Grid -->
+<div class="dashboard-grid">
+    <!-- Top Performers -->
+    <div class="card">
+        <div class="card-header">Top Performers</div>
+        <div class="card-body">
+            <div th:each="performer : ${topPerformers}" style="margin-bottom: 12px; padding: 8px; background: var(--panel-2); border-radius: 6px;">
+                <div><strong th:text="${performer.employee.firstName + ' ' + performer.employee.lastName}">John Doe</strong></div>
+                <div class="muted">Rating: <span th:text="${#numbers.formatDecimal(performer.averageRating, 1, 1)}">4.5</span>/5.0</div>
+            </div>
+            <div th:if="${topPerformers.isEmpty()}" class="muted">No performance data available</div>
+        </div>
+    </div>
+
+    <!-- KPI Summary -->
+    <div class="card">
+        <div class="card-header">KPI Progress Summary</div>
+        <div class="card-body">
+            <div th:each="kpiItem : ${kpiSummary}" class="kpi-progress">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span th:text="${kpiItem.kpi.name}">Sales Target</span>
+                    <span th:text="${#numbers.formatDecimal(kpiItem.progress, 1, 1)} + '%'">85.0%</span>
+                </div>
+                <div class="kpi-progress-bar">
+                    <div class="kpi-progress-fill" 
+                         th:class="'kpi-progress-fill ' + ${kpiItem.status.toLowerCase().replace(' ', '-')}"
+                         th:style="'width: ' + ${#numbers.formatDecimal(kpiItem.progress, 1, 1)} + '%'"></div>
+                </div>
+                <div class="muted" style="font-size: 0.8em; margin-top: 2px;">
+                    <span th:text="${kpiItem.kpi.currentValue}">85</span> / <span th:text="${kpiItem.kpi.targetValue}">100</span>
+                    <span th:text="'(' + ${kpiItem.status} + ')'" style="margin-left: 8px;">(On Track)</span>
+                </div>
+            </div>
+            <div th:if="${kpiSummary.isEmpty()}" class="muted">No KPIs available</div>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Trends (Placeholder) -->
+<div class="spacer"></div>
+<div class="card">
+    <div class="card-header">Performance Trends</div>
+    <div class="card-body">
+        <div style="text-align: center; padding: 40px; color: var(--muted);">
+            <p>Performance trend charts would be displayed here</p>
+            <p class="muted">(Integration with charting library like Chart.js would be needed)</p>
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+</div>
+</main>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Notifications</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+</head>
+<body>
+<div class="container">
+<div class="card">
+<div class="card-header">
+    Notifications for <span th:text="${currentUser.username}">user</span>
+    <span th:if="${unreadNotificationCount > 0}" 
+          class="badge" 
+          style="background: #ef4444; color: white; margin-left: 8px; font-size: 12px; padding: 4px 8px;"
+          th:text="${unreadNotificationCount} + ' unread'">0 unread</span>
+</div>
+<div class="card-body">
+
+<form class="toolbar" method="get">
+    <label class="muted"><input type="checkbox" name="unread" value="true" th:checked="${unread}"> Unread only</label>
+    <input type="submit" value="Apply">
+    </form>
+
+<div class="stack">
+    <a href="/" class="btn secondary">Back</a>
+    <a href="/notifications/new" class="btn" th:if="${isAdminOrHr}">Add Notification</a>
+    <form method="post" th:action="@{/notifications/delete-all}" th:if="${isAdminOrHr}" style="display:inline; margin-left: auto;">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <input type="submit" value="Delete All" class="btn danger" onclick="return confirm('Delete all notifications?');">
+    </form>
+    </div>
+<div class="spacer"></div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Message</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr th:each="n: ${notifications}">
+        <td th:text="${n.message}">Message</td>
+        <td>
+            <span th:if="${n.read}" class="badge" style="background: #e5e7eb; color: #6b7280;">Read</span>
+            <span th:unless="${n.read}" class="badge" style="background: #fef3c7; color: #92400e;">Unread</span>
+            <span th:if="${n.expired}" class="badge" style="background: #fee2e2; color: #991b1b; margin-left: 4px;">Expired</span>
+        </td>
+        <td th:text="${#temporals.format(n.createdAt, 'yyyy-MM-dd HH:mm')}">2025-01-01 00:00</td>
+        <td>
+            <div class="stack">
+                <a th:if="${isAdminOrHr}" th:href="@{'/notifications/' + ${n.id} + '/edit'}" class="btn secondary">Edit</a>
+                <form method="post" th:action="@{/notifications/mark-read}" th:if="${!n.read}" style="display:inline;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="hidden" name="id" th:value="${n.id}">
+                    <input type="submit" value="Mark Read" class="btn secondary">
+                </form>
+                <form method="post" th:action="@{/notifications/delete}" style="display:inline;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="hidden" name="id" th:value="${n.id}">
+                    <input type="submit" value="Delete" class="btn danger">
+                </form>
+            </div>
+        </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(notifications)}">
+        <td colspan="4" style="text-align: center; color: var(--muted); padding: 20px;">
+            <span th:if="${unread}">No unread notifications</span>
+            <span th:unless="${unread}">No notifications found</span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</div>
+</div>
+</div>
+</body>
+</html>
+
+

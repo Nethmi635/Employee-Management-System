@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Swap Request</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+</head>
+<body>
+    <div class="app-layout">
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Test Swap Request</h1>
+            </div>
+            
+            <div class="content-body">
+                <div class="card">
+                    <div class="card-header">Test Results</div>
+                    <div class="card-body">
+                        <p th:text="${message}">Test message</p>
+                        
+                        <div th:if="${swapRequest != null}">
+                            <h3>Created Swap Request Details:</h3>
+                            <ul>
+                                <li>ID: <span th:text="${swapRequest.id}"></span></li>
+                                <li>Status: <span th:text="${swapRequest.status}"></span></li>
+                                <li>Requester: <span th:text="${swapRequest.requester.firstName + ' ' + swapRequest.requester.lastName}"></span></li>
+                                <li>Target Employee: <span th:text="${swapRequest.targetEmployee.firstName + ' ' + swapRequest.targetEmployee.lastName}"></span></li>
+                                <li>Reason: <span th:text="${swapRequest.reason}"></span></li>
+                                <li>Requested At: <span th:text="${#temporals.format(swapRequest.requestedAt, 'yyyy-MM-dd HH:mm')}"></span></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="spacer"></div>
+                        <a href="/shifts" class="btn">Back to Shifts</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

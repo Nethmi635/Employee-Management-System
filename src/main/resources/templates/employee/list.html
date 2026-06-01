@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Employees</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+    <style> .actions a{ margin-right:8px; } </style>
+    <script>
+        function confirmDelete(id){ if(confirm('Delete employee?')){ document.getElementById('del-'+id).submit(); } }
+    </script>
+</head>
+<body>
+<div class="container">
+<div class="card">
+    <div class="card-header">Employees</div>
+    <div class="card-body">
+<form class="toolbar" method="get">
+    <input type="text" name="q" placeholder="Search name/email" th:value="${q}">
+    <select name="active">
+        <option th:selected="${active == null}" value="">All</option>
+        <option th:selected="${active == true}" value="true">Active</option>
+        <option th:selected="${active == false}" value="false">Inactive</option>
+    </select>
+    <input type="text" name="department" placeholder="Department" th:value="${department}">
+    <input type="text" name="jobTitle" placeholder="Job Title" th:value="${jobTitle}">
+    <select name="employmentType">
+        <option value="" th:selected="${employmentType == ''}">Any Type</option>
+        <option value="FULL_TIME" th:selected="${employmentType == 'FULL_TIME'}">Full-Time</option>
+        <option value="CONTRACT" th:selected="${employmentType == 'CONTRACT'}">Contract</option>
+    </select>
+    <input type="submit" value="Filter">
+    <a class="btn" href="/employee/new">Add Employee</a>
+    <a class="btn secondary" href="/">Back</a>
+    </form>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th><th>Name</th><th>Email</th><th>Dept</th><th>Title</th><th>Type</th><th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="e : ${employees}">
+        <td th:text="${e.id}">1</td>
+        <td th:text="${e.firstName + ' ' + e.lastName}">John Doe</td>
+        <td th:text="${e.email}">john@corp.com</td>
+        <td th:text="${e.department}">IT</td>
+        <td th:text="${e.jobTitle}">Engineer</td>
+        <td th:text="${#strings.equalsIgnoreCase(e.class.simpleName,'FullTimeEmployee') ? 'Full-Time' : 'Contract'}">Full-Time</td>
+        <td class="table-actions stack">
+            <a class="btn secondary" th:href="@{'/employee/' + ${e.id}}">View</a>
+            <a class="btn" th:href="@{'/employee/' + ${e.id} + '/edit'}">Edit</a>
+            <form th:id="${'del-' + e.id}" th:action="@{'/employee/' + ${e.id} + '/delete'}" method="post" style="display:inline;">
+                <button class="btn danger" type="button" th:attr="onclick=|confirmDelete([[${e.id}]])|">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+    <tfoot><tr><td colspan="7" th:text="${#lists.size(employees)} + ' result(s)'"></td></tr></tfoot>
+    </table>
+    </div>
+    </div>
+    </div>
+</body>
+</html>
+
+

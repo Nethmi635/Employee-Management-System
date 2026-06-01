@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Attendance</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+</head>
+<body>
+<div class="container">
+<div class="card">
+<div class="card-header">Add Attendance</div>
+<div class="card-body">
+    <a class="btn secondary" href="/attendance">Back</a>
+    <div class="spacer"></div>
+    <form th:action="@{/attendance/new}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <div class="form-row">
+            <div class="form-col">
+                <label>Employee</label>
+                <select name="employeeId" required>
+                    <option value="">Select Employee</option>
+                    <option th:each="e : ${employees}" th:value="${e.id}" th:text="${e.firstName + ' ' + e.lastName}"></option>
+                </select>
+            </div>
+            <div class="form-col">
+                <label>Date</label>
+                <input type="date" name="date" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-col">
+                <label>Check-In Time</label>
+                <input type="datetime-local" name="checkInAt" placeholder="yyyy-MM-ddTHH:mm">
+            </div>
+            <div class="form-col">
+                <label>Check-Out Time</label>
+                <input type="datetime-local" name="checkOutAt" placeholder="yyyy-MM-ddTHH:mm">
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <input type="submit" value="Add Attendance" class="btn">
+    </form>
+</div>
+</div>
+</div>
+</body>
+</html>

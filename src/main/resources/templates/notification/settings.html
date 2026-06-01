@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Notification Settings</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/>
+    <style>
+        .settings-section {
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+        .setting-label {
+            font-weight: 500;
+        }
+        .setting-controls {
+            display: flex;
+            gap: 12px;
+        }
+        .toggle-group {
+            display: flex;
+            gap: 8px;
+        }
+        .toggle-group label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <div class="container">
+        <div class="brand">SLIIT EMS</div>
+        <nav class="nav">
+            <a href="/">Dashboard</a>
+            <a href="/profile">My Profile</a>
+            <a href="/employee">Employees</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/attendance/calendar">Calendar</a>
+            <a href="/leave">Leave</a>
+            <a href="/leave/balances">Balances</a>
+            <a href="/approvals">Approvals</a>
+            <a href="/performance">Performance</a>
+            <a href="/shifts">Shifts</a>
+            <a href="/shifts/calendar">Shift Calendar</a>
+            <a href="/shifts/roster">Team Roster</a>
+            <a href="/reports">Reports</a>
+            <a href="/notifications">Notifications</a>
+            <a href="/alerts">Alerts Dashboard</a>
+            <a class="btn secondary" href="/logout">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+<div class="card">
+<div class="card-header">
+    Notification Settings
+    <div class="stack" style="float: right;">
+        <a class="btn secondary" href="/notifications">View Notifications</a>
+        <a class="btn secondary" href="/alerts">Alerts Dashboard</a>
+        <a class="btn secondary" href="/">Back to Dashboard</a>
+    </div>
+</div>
+<div class="card-body">
+
+<div th:if="${param.success}" class="alert" style="background: #d1fae5; color: #065f46; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+    Settings updated successfully!
+</div>
+
+<form th:action="@{/notifications/settings}" method="post">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+    <!-- General Settings -->
+    <div class="settings-section">
+        <h3>General Settings</h3>
+        <div class="setting-row">
+            <span class="setting-label">Email Notifications</span>
+            <div class="setting-controls">
+                <label>
+                    <input type="checkbox" name="emailEnabled" th:checked="${settings.emailEnabled}">
+                    Enable Email
+                </label>
+            </div>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">SMS Notifications</span>
+            <div class="setting-controls">
+                <label>
+                    <input type="checkbox" name="smsEnabled" th:checked="${settings.smsEnabled}">
+                    Enable SMS
+                </label>
+            </div>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">Push Notifications</span>
+            <div class="setting-controls">
+                <label>
+                    <input type="checkbox" name="pushEnabled" th:checked="${settings.pushEnabled}">
+                    Enable Push
+                </label>
+            </div>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">Email Address</span>
+            <div class="setting-controls">
+                <input type="email" name="emailAddress" th:value="${settings.emailAddress}" placeholder="your@email.com">
+            </div>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">Phone Number</span>
+            <div class="setting-controls">
+                <input type="tel" name="phoneNumber" th:value="${settings.phoneNumber}" placeholder="+1234567890">
+            </div>
+        </div>
+    </div>
+
+    <!-- Approval Notifications -->
+    <div class="settings-section">
+        <h3>Approval Notifications</h3>
+        <div class="setting-row">
+            <span class="setting-label">Enable Approval Notifications</span>
+            <div class="setting-controls">
+                <label>
+                    <input type="checkbox" name="approvalNotifications" th:checked="${settings.approvalNotifications}">
+                    Enable
+                </label>
+            </div>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">Delivery Methods</span>
+            <div class="setting-controls">
+                <div class="toggle-group">
+                    <label>
+                        <input type="checkbox" name="approvalEmail" th:checked="${settings.approvalEmail}">
+                        Email
+                    </label>
+                    <label>
+                        <input type="checkbox" name="approvalSms" th:checked="${settings.approvalSms}">
+                        SMS
+                    </label>
+                    <label>
+                        <input type="checkbox" name="approvalPush" th:checked="${settings.approvalPush}">
+                        Push
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Notifications -->
+    <div class="settings-section">
+        <h3>Performance Notifications</h3>
+        <div class="setting-row">
+            <span class="setting-label">Enable Performance Notifications</span>
+            <div class="setting-controls">
+                <label>
+                    <input type="checkbox" name="performanceNotifications" th:checked="${settings.performanceNotifications}">
+                    Enable
+                </label>
+            </div>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">Delivery Methods</span>
+            <div class="setting-controls">
+                <div class="toggle-group">
+                    <label>
+                        <input type="checkbox" name="performanceEmail" th:checked="${settings.performanceEmail}">
+                        Email
+                    </label>
+                    <label>
+                        <input type="checkbox" name="performanceSms" th:checked="${settings.performanceSms}">
+                        SMS
+                    </label>
+                    <label>
+                        <input type="checkbox" name="performancePush" th:checked="${settings.performancePush}">
+                        Push
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Notifications -->
+    <div class="settings-section">
+        <h3>Attendance Notifications</h3>
+        <div class="setting-row">
+            <span class="setting-label">Enable Attendance Notifications</span>
+            <div class="setting-controls">
+                <label>
+                    <input type="checkbox" name="attendanceNotifications" th:checked="${settings.attendanceNotifications}">
+                    Enable
+                </label>
+            </div>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">Delivery Methods</span>
+            <div class="setting-controls">
+                <div class="toggle-group">
+                    <label>
+                        <input type="checkbox" name="attendanceEmail" th:checked="${settings.attendanceEmail}">
+                        Email
+                    </label>
+                    <label>
+                        <input type="checkbox" name="attendanceSms" th:checked="${settings.attendanceSms}">
+                        SMS
+                    </label>
+                    <label>
+                        <input type="checkbox" name="attendancePush" th:checked="${settings.attendancePush}">
+                        Push
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shift Notifications -->
+    <div class="settings-section">
+        <h3>Shift Notifications</h3>
+        <div class="setting-row">
+            <span class="setting-label">Enable Shift Notifications</span>
+            <div class="setting-controls">
+                <label>
+                    <input type="checkbox" name="shiftNotifications" th:checked="${settings.shiftNotifications}">
+                    Enable
+                </label>
+            </div>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">Delivery Methods</span>
+            <div class="setting-controls">
+                <div class="toggle-group">
+                    <label>
+                        <input type="checkbox" name="shiftEmail" th:checked="${settings.shiftEmail}">
+                        Email
+                    </label>
+                    <label>
+                        <input type="checkbox" name="shiftSms" th:checked="${settings.shiftSms}">
+                        SMS
+                    </label>
+                    <label>
+                        <input type="checkbox" name="shiftPush" th:checked="${settings.shiftPush}">
+                        Push
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leave Notifications -->
+    <div class="settings-section">
+        <h3>Leave Notifications</h3>
+        <div class="setting-row">
+            <span class="setting-label">Enable Leave Notifications</span>
+            <div class="setting-controls">
+                <label>
+                    <input type="checkbox" name="leaveNotifications" th:checked="${settings.leaveNotifications}">
+                    Enable
+                </label>
+            </div>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">Delivery Methods</span>
+            <div class="setting-controls">
+                <div class="toggle-group">
+                    <label>
+                        <input type="checkbox" name="leaveEmail" th:checked="${settings.leaveEmail}">
+                        Email
+                    </label>
+                    <label>
+                        <input type="checkbox" name="leaveSms" th:checked="${settings.leaveSms}">
+                        SMS
+                    </label>
+                    <label>
+                        <input type="checkbox" name="leavePush" th:checked="${settings.leavePush}">
+                        Push
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Notifications -->
+    <div class="settings-section">
+        <h3>System Notifications</h3>
+        <div class="setting-row">
+            <span class="setting-label">Enable System Notifications</span>
+            <div class="setting-controls">
+                <label>
+                    <input type="checkbox" name="systemNotifications" th:checked="${settings.systemNotifications}">
+                    Enable
+                </label>
+            </div>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">Delivery Methods</span>
+            <div class="setting-controls">
+                <div class="toggle-group">
+                    <label>
+                        <input type="checkbox" name="systemEmail" th:checked="${settings.systemEmail}">
+                        Email
+                    </label>
+                    <label>
+                        <input type="checkbox" name="systemSms" th:checked="${settings.systemSms}">
+                        SMS
+                    </label>
+                    <label>
+                        <input type="checkbox" name="systemPush" th:checked="${settings.systemPush}">
+                        Push
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Notifications -->
+    <div class="settings-section">
+        <h3>Security Notifications</h3>
+        <div class="setting-row">
+            <span class="setting-label">Enable Security Notifications</span>
+            <div class="setting-controls">
+                <label>
+                    <input type="checkbox" name="securityNotifications" th:checked="${settings.securityNotifications}">
+                    Enable
+                </label>
+            </div>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">Delivery Methods</span>
+            <div class="setting-controls">
+                <div class="toggle-group">
+                    <label>
+                        <input type="checkbox" name="securityEmail" th:checked="${settings.securityEmail}">
+                        Email
+                    </label>
+                    <label>
+                        <input type="checkbox" name="securitySms" th:checked="${settings.securitySms}">
+                        SMS
+                    </label>
+                    <label>
+                        <input type="checkbox" name="securityPush" th:checked="${settings.securityPush}">
+                        Push
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="spacer"></div>
+    <input type="submit" value="Save Settings" class="btn">
+</form>
+
+</div>
+</div>
+</div>
+</main>
+</body>
+</html>
